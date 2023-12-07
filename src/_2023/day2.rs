@@ -23,6 +23,7 @@ pub fn part_one() -> i32 {
                 .filter_map(|cap| cap.get(0))
                 .map(|m| m.as_str())
                 .collect();
+
             let id = id_re
                 .find(line)
                 .expect("Failed to find ID")
@@ -80,7 +81,6 @@ pub fn part_two() -> i32 {
                 .captures_iter(line)
                 .filter_map(|cap| cap.get(0))
                 .map(|m| m.as_str())
-                .filter(|m| !m.is_empty())
                 .collect::<Vec<&str>>();
 
             caps
