@@ -11,17 +11,10 @@ pub fn part_one() -> i32 {
                 .collect::<Vec<i32>>()
         })
         .map(|x| {
-            if x.is_empty() {
-                return 0;
-            }
-            if x.len() == 1 {
-                return x[0];
-            }
-
             let mut tree: Vec<Vec<i32>> = vec![x.clone()];
             let mut line = x.clone();
 
-            while line.iter().sum::<i32>() != 0 {
+            while line.len() > 1 {
                 let mut new_line = Vec::new();
                 for i in 0..line.len() - 1 {
                     new_line.push(line[i + 1] - line[i]);
