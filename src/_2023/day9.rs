@@ -48,25 +48,21 @@ pub fn part_two() -> i32 {
                 .collect::<Vec<i32>>()
         })
         .map(|x| {
-            let mut tree: Vec<Vec<i32>> = vec![];
-
+            let mut tree: Vec<Vec<i32>> = vec![x.clone()];
             let mut line = x.clone();
 
-            while line.iter().sum::<i32>() != 0 {
+            // Construct the tree of differences
+            while line.len() > 1 {
                 let mut new_line = Vec::new();
 
                 for i in 0..line.len() - 1 {
                     new_line.push(line[i + 1] - line[i]);
                 }
-
                 line = new_line.clone();
+
                 tree.push(new_line);
             }
 
-            // Push original input again to complete top row
-            tree.push(x.clone());
-
-            // Fold using sum of complete top row
             tree.iter()
                 .rev()
                 .fold(0, |acc, row| row.first().unwrap_or(&0) - acc)
