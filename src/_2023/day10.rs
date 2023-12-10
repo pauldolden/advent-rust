@@ -69,7 +69,6 @@ fn explore(
     }
 
     let next_val = grid[&(next.0 as i32)][next.1];
-    let current_val = grid[&(current.0 as i32)][current.1];
 
     if valid.contains(&next_val) {
         visited.insert(next);
