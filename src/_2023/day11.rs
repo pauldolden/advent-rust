@@ -1,7 +1,7 @@
 use std::fs;
 
 pub fn part_one() -> i64 {
-    let mut grid = fs::read_to_string("src/_2023/11.txt")
+    let grid = fs::read_to_string("src/_2023/11.txt")
         .unwrap()
         .lines()
         .filter(|x| !x.is_empty())
@@ -28,20 +28,20 @@ pub fn part_one() -> i64 {
             empty_cols.push(col);
         }
     }
+    let empty_rows_i64 = empty_rows.iter().map(|&r| r as i64).collect::<Vec<i64>>();
+    let empty_cols_i64 = empty_cols.iter().map(|&c| c as i64).collect::<Vec<i64>>();
 
-    // duplicate all columns that are only .
-    for row in grid.iter_mut() {
-        for (c, col) in empty_cols.iter().enumerate() {
-            row.insert(*col + (c + 1), '.');
-        }
+    let mut nodes = find_nodes(&grid);
+
+    // shift nodes by empty rows and cols
+    for node in nodes.iter_mut() {
+        shift_node(
+            node,
+            empty_rows_i64.clone(),
+            empty_cols_i64.clone(),
+            1, // I was doing 1_000_000
+        );
     }
-
-    // duplicate all rows that are only .
-    for row in empty_rows.iter() {
-        grid.insert(*row + 1, vec!['.'; grid[0].len()]);
-    }
-
-    let nodes = find_nodes(&grid);
 
     let mut total = 0;
 
