@@ -175,19 +175,11 @@ fn walk_two(grid: &mut Vec<Vec<char>>) -> usize {
         }
     }
 
-    let outside_loop: HashSet<(usize, usize)> = HashSet::new();
-
-    for (r, row) in grid.iter().enumerate() {
-        let mut within = false;
-        let mut up = false;
-        for (c, ch) in row.iter().enumerate() {}
-    }
-
     let mut outside = HashSet::new();
 
     // replace S with F (or 7 for main)
-    for (r, row) in grid.iter_mut().enumerate() {
-        for (c, ch) in row.iter_mut().enumerate() {
+    for row in grid.iter_mut() {
+        for ch in row.iter_mut() {
             if *ch == 'S' {
                 *ch = '7'; // main input
             }
