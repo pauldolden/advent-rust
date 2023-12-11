@@ -99,15 +99,15 @@ pub fn part_two() -> i32 {
         .map(|l| l.to_string().chars().collect::<Vec<char>>())
         .collect::<Vec<Vec<char>>>();
 
-    walk_two(&mut grid.clone());
+    let res = walk_two(&mut grid.clone());
 
-    0
+    res as i32
 }
 
-fn walk_two(grid: &mut Vec<Vec<char>>) {
+fn walk_two(grid: &mut Vec<Vec<char>>) -> usize {
     let mut start = (0, 0);
-    let mut visited: HashSet<(usize, usize)> = HashSet::new();
-    let mut queue: VecDeque<(usize, usize)> = VecDeque::new();
+    let mut loop_set = HashSet::new();
+    let mut q = VecDeque::new();
 
     for (r, row) in grid.iter().enumerate() {
         for (c, ch) in row.iter().enumerate() {
@@ -117,67 +117,117 @@ fn walk_two(grid: &mut Vec<Vec<char>>) {
         }
     }
 
-    visited.insert(start);
-    queue.push_back(start);
+    loop_set.insert(start);
+    q.push_back(start);
 
-    let dirs = vec![
-        ((0, 1), vec!['-', 'J', '7']),  // Right
-        ((0, -1), vec!['-', 'F', 'L']), // Left
-        ((1, 0), vec!['|', 'L', 'J']),  // Down
-        ((-1, 0), vec!['|', '7', 'F']), // Up
-    ];
+    while let Some((r, c)) = q.pop_front() {
+        let ch = grid[r][c];
+        let grid_len = grid.len();
+        let row_len = grid[0].len();
 
-    while !queue.is_empty() {
-        let current = queue.pop_front().unwrap();
+        // Up
+        if r > 0
+            && "S|JL".contains(ch)
+            && "|7F".contains(grid[r - 1][c])
+            && !loop_set.contains(&(r - 1, c))
+        {
+            loop_set.insert((r - 1, c));
+            q.push_back((r - 1, c));
+        }
 
-        for (dir, valid) in dirs.iter() {
-            let next = (
-                (current.0 as i32 + dir.0) as usize,
-                (current.1 as i32 + dir.1) as usize,
-            );
+        // Down
+        if r < grid_len - 1
+            && "S|F7".contains(ch)
+            && "|LJ".contains(grid[r + 1][c])
+            && !loop_set.contains(&(r + 1, c))
+        {
+            loop_set.insert((r + 1, c));
+            q.push_back((r + 1, c));
+        }
 
-            if next.0 >= grid.len()
-                || next.1 >= grid[0].len()
-                || visited.contains(&next)
-                || !valid.contains(&grid[next.0][next.1])
-            {
-                continue;
+        // Left
+        if c > 0
+            && "S-J7".contains(ch)
+            && "-LF".contains(grid[r][c - 1])
+            && !loop_set.contains(&(r, c - 1))
+        {
+            loop_set.insert((r, c - 1));
+            q.push_back((r, c - 1));
+        }
+
+        // Right
+        if c < row_len - 1
+            && "S-FL".contains(ch)
+            && "-7J".contains(grid[r][c + 1])
+            && !loop_set.contains(&(r, c + 1))
+        {
+            loop_set.insert((r, c + 1));
+            q.push_back((r, c + 1));
+        }
+    }
+
+    // replace non-loop chars with spaces
+    for (r, row) in grid.iter_mut().enumerate() {
+        for (c, ch) in row.iter_mut().enumerate() {
+            if !loop_set.contains(&(r, c)) && *ch != 'S' {
+                *ch = '.';
             }
-
-            visited.insert(next);
-            queue.push_back(next);
         }
     }
 
-    println!("Visited: {:?}", visited.len() / 2);
-}
+    let outside_loop: HashSet<(usize, usize)> = HashSet::new();
 
-fn print_grid(grid: &Vec<Vec<char>>) {
-    for row in grid {
-        for c in row {
-            print!("{}", c);
+    for (r, row) in grid.iter().enumerate() {
+        let mut within = false;
+        let mut up = false;
+        for (c, ch) in row.iter().enumerate() {}
+    }
+
+    let mut outside = HashSet::new();
+
+    // replace S with F (or 7 for main)
+    for (r, row) in grid.iter_mut().enumerate() {
+        for (c, ch) in row.iter_mut().enumerate() {
+            if *ch == 'S' {
+                *ch = '7'; // main input
+            }
         }
-        println!();
-    }
-}
-
-fn flood_fill(grid: &mut Vec<Vec<char>>, x: usize, y: usize, target: char, replacement: char) {
-    if x >= grid.len() || y >= grid[0].len() || grid[x][y] != target {
-        return;
     }
 
-    grid[x][y] = replacement;
+    for (r, row) in grid.iter().enumerate() {
+        println!("{}", row.iter().collect::<String>());
+        let mut within = false;
+        let mut up: Option<bool> = None;
+        for (c, &ch) in row.iter().enumerate() {
+            match ch {
+                '|' => {
+                    assert!(up.is_none(), "up should be None");
+                    within = !within;
+                }
+                '-' => {
+                    assert!(up.is_some(), "up should be Some");
+                }
+                'L' | 'F' => {
+                    assert!(up.is_none(), "up should be None");
+                    up = Some(ch == 'L');
+                }
+                '7' | 'J' => {
+                    assert!(up.is_some(), "up should be Some");
+                    if ch != if up.unwrap() { 'J' } else { '7' } {
+                        within = !within;
+                    }
+                    up = None;
+                }
+                '.' => {}
+                _ => panic!("unexpected character (horizontal): {}", ch),
+            }
+            if !within {
+                outside.insert((r, c));
+            }
+        }
+    }
 
-    if x > 0 {
-        flood_fill(grid, x - 1, y, target, replacement);
-    }
-    if x < grid.len() - 1 {
-        flood_fill(grid, x + 1, y, target, replacement);
-    }
-    if y > 0 {
-        flood_fill(grid, x, y - 1, target, replacement);
-    }
-    if y < grid[0].len() - 1 {
-        flood_fill(grid, x, y + 1, target, replacement);
-    }
+    let tiles = grid.len() * grid[0].len();
+
+    tiles - outside.union(&loop_set).count()
 }
