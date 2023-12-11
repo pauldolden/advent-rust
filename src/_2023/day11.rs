@@ -13,9 +13,9 @@ pub fn part_one() -> i64 {
     let mut empty_rows = Vec::new();
     let mut empty_cols = Vec::new();
 
-    for (i, row) in grid.clone().iter().rev().enumerate() {
+    for (i, row) in grid.iter().enumerate() {
         if row.iter().all(|c| *c == '.') {
-            empty_rows.push(grid.len() - i - 1);
+            empty_rows.push(i);
         }
     }
 
@@ -54,26 +54,6 @@ pub fn part_one() -> i64 {
     total
 }
 
-fn manhattan_distance(p1: (i64, i64), p2: (i64, i64)) -> i64 {
-    let (x1, y1) = p1;
-    let (x2, y2) = p2;
-    (x2 - x1).abs() + (y2 - y1).abs()
-}
-
-fn find_nodes(grid: &Vec<Vec<char>>) -> Vec<(i64, i64)> {
-    let mut nodes = Vec::new();
-
-    for (r, row) in grid.iter().enumerate() {
-        for (c, ch) in row.iter().enumerate() {
-            if ch == &'#' {
-                nodes.push((r as i64, c as i64));
-            }
-        }
-    }
-
-    nodes
-}
-
 pub fn part_two() -> i64 {
     let grid = fs::read_to_string("src/_2023/11.txt")
         .unwrap()
@@ -83,7 +63,6 @@ pub fn part_two() -> i64 {
         .map(|l| l.chars().collect::<Vec<char>>())
         .collect::<Vec<Vec<char>>>();
 
-    // duplicate all rows that are only .
     let mut empty_rows = Vec::new();
     let mut empty_cols = Vec::new();
 
@@ -112,11 +91,13 @@ pub fn part_two() -> i64 {
 
     // shift nodes by empty rows and cols
     for node in nodes.iter_mut() {
-        shift_node(node, empty_rows_i64.clone(), empty_cols_i64.clone(), 1);
+        shift_node(
+            node,
+            empty_rows_i64.clone(),
+            empty_cols_i64.clone(),
+            999_999, // I was doing 1_000_000
+        );
     }
-
-    println!("Nodes: {:?}", nodes);
-    println!("Shifted Nodes: {:?}", nodes);
 
     for i in 0..nodes.len() {
         for j in (i + 1)..nodes.len() {
@@ -127,11 +108,31 @@ pub fn part_two() -> i64 {
     total
 }
 
-fn shift_node(node: &mut (i64, i64), empty_rows: &[i64], empty_cols: &[i64], scale: i64) {
+fn shift_node(node: &mut (i64, i64), empty_rows: Vec<i64>, empty_cols: Vec<i64>, scale: i64) {
     let (r, c) = *node;
 
     let r_shift = empty_rows.iter().filter(|&&row| row < r).count() as i64 * scale;
     let c_shift = empty_cols.iter().filter(|&&col| col < c).count() as i64 * scale;
 
     *node = (r + r_shift, c + c_shift);
+}
+
+fn manhattan_distance(p1: (i64, i64), p2: (i64, i64)) -> i64 {
+    let (x1, y1) = p1;
+    let (x2, y2) = p2;
+    (x2 - x1).abs() + (y2 - y1).abs()
+}
+
+fn find_nodes(grid: &Vec<Vec<char>>) -> Vec<(i64, i64)> {
+    let mut nodes = Vec::new();
+
+    for (r, row) in grid.iter().enumerate() {
+        for (c, ch) in row.iter().enumerate() {
+            if ch == &'#' {
+                nodes.push((r as i64, c as i64));
+            }
+        }
+    }
+
+    nodes
 }
