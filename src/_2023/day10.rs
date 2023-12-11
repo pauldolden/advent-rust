@@ -195,7 +195,6 @@ fn walk_two(grid: &mut Vec<Vec<char>>) -> usize {
     }
 
     for (r, row) in grid.iter().enumerate() {
-        println!("{}", row.iter().collect::<String>());
         let mut within = false;
         let mut up: Option<bool> = None;
         for (c, &ch) in row.iter().enumerate() {
