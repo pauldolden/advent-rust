@@ -89,7 +89,7 @@ fn validate_hash_groups(line: &str, numbers: &[i32]) -> i32 {
     1
 }
 
-fn walk_line_two(cfg: String, nums: Vec<i32>, cache: &mut HashMap<(String, Vec<i32>), i32>) -> i32 {
+fn walk_line_two(cfg: String, nums: Vec<i32>, cache: &mut HashMap<(String, Vec<i32>), i64>) -> i64 {
     if cfg.is_empty() {
         if nums.is_empty() {
             return 1;
@@ -180,15 +180,14 @@ pub fn part_two() -> i64 {
         })
         .collect::<Vec<(Vec<String>, Vec<i32>)>>();
 
-    let cache = Mutex::new(HashMap::new());
-
     let count = grid
         .par_iter()
         .map(|line| {
+            let cache = Mutex::new(HashMap::new());
             let mut cache = cache.lock().unwrap_or_else(|e| e.into_inner());
             walk_line_two(line.0.join(""), line.1.clone(), &mut cache)
         })
-        .sum::<i32>() as i64;
+        .sum::<i64>() as i64;
 
     count as i64
 }
