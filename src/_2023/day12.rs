@@ -1,5 +1,5 @@
 use regex::Regex;
-use std::fs;
+use std::{collections::HashMap, fs};
 
 #[derive(Debug)]
 pub struct Line {
@@ -87,6 +87,59 @@ fn validate_hash_groups(line: &str, numbers: &[i32]) -> i32 {
     1
 }
 
+fn walk_line_two(cfg: String, nums: Vec<i32>, cache: &mut HashMap<(String, Vec<i32>), i32>) -> i32 {
+    if cfg.is_empty() {
+        if nums.is_empty() {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    if nums.is_empty() {
+        if cfg.contains("#") {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    let key = (cfg.clone(), nums.clone());
+
+    if cache.contains_key(&key) {
+        return *cache.get(&key).unwrap();
+    }
+
+    let mut result = 0;
+
+    if ".?".contains(cfg.chars().nth(0).unwrap()) {
+        let mut new_cfg = cfg.clone();
+        new_cfg.remove(0);
+        result += walk_line_two(new_cfg, nums.clone(), cache);
+    }
+
+    if "#?".contains(cfg.chars().nth(0).unwrap()) {
+        let str_cfg = cfg.as_str();
+        if nums[0] <= cfg.len() as i32
+            && !str_cfg[..(nums[0] as usize)].contains(".")
+            && ((nums[0] as usize) == cfg.len()
+                || str_cfg.chars().nth(nums[0] as usize).unwrap() != '#')
+        {
+            let cfg_slice = if (nums[0] as usize) < cfg.len() {
+                cfg[(nums[0] as usize + 1)..].to_string()
+            } else {
+                String::new()
+            };
+
+            let nums_slice = if nums.len() > 1 { &nums[1..] } else { &[] };
+            result += walk_line_two(cfg_slice, nums_slice.to_vec(), cache);
+        }
+    }
+
+    cache.insert(key, result);
+    result
+}
+
 pub fn part_two() -> i64 {
     let grid = fs::read_to_string("src/_2023/12.txt").unwrap();
     let grid = grid
@@ -112,8 +165,7 @@ pub fn part_two() -> i64 {
                 .split("")
                 .filter(|c| !c.is_empty())
                 .map(|c| c.to_string())
-                .map(|s| s.chars().next().unwrap())
-                .collect::<Vec<char>>();
+                .collect::<Vec<String>>();
 
             let numbers = l[1]
                 .split(",")
@@ -122,13 +174,14 @@ pub fn part_two() -> i64 {
 
             let numbers = (0..5).flat_map(|_| numbers.clone()).collect::<Vec<i32>>();
 
-            Line { springs, numbers }
+            (springs, numbers)
         })
-        .collect::<Vec<Line>>();
+        .collect::<Vec<(Vec<String>, Vec<i32>)>>();
 
     let mut count = 0;
+    let mut cache = HashMap::new();
     for line in grid.iter() {
-        count += walk_line(&mut line.springs.clone(), 0, &line.numbers, 0, 0);
+        count += walk_line_two(line.0.join(""), line.1.clone(), &mut cache);
     }
 
     count as i64
