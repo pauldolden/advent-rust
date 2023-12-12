@@ -23,7 +23,7 @@ fn main() {
     // let d102 = crate::_2023::day10::part_two();
     // let d111 = crate::_2023::day11::part_one();
     // let d112 = crate::_2023::day11::part_two();
-    let d121 = crate::_2023::day12::part_one();
+    // let d121 = crate::_2023::day12::part_one();
     let d122 = crate::_2023::day12::part_two();
 
     // println!("Day 1 Part 1: {}", d11);
@@ -38,6 +38,6 @@ fn main() {
     // println!("Day 9 Part 2: {}", d92);
     // println!("Day 10 Part 1: {}", d101);
     // println!("Day 10 Part 2: {}", d102);
-    println!("Day 12 Part 1: {}", d121);
-    // println!("Day 12 Part 2: {}", d122);
+    // println!("Day 12 Part 1: {}", d121);
+    println!("Day 12 Part 2: {}", d122);
 }
