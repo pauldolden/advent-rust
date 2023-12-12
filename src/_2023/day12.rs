@@ -1,4 +1,6 @@
+use rayon::prelude::*;
 use regex::Regex;
+use std::sync::Mutex;
 use std::{collections::HashMap, fs};
 
 #[derive(Debug)]
@@ -178,11 +180,15 @@ pub fn part_two() -> i64 {
         })
         .collect::<Vec<(Vec<String>, Vec<i32>)>>();
 
-    let mut count = 0;
-    let mut cache = HashMap::new();
-    for line in grid.iter() {
-        count += walk_line_two(line.0.join(""), line.1.clone(), &mut cache);
-    }
+    let cache = Mutex::new(HashMap::new());
+
+    let count = grid
+        .par_iter()
+        .map(|line| {
+            let mut cache = cache.lock().unwrap_or_else(|e| e.into_inner());
+            walk_line_two(line.0.join(""), line.1.clone(), &mut cache)
+        })
+        .sum::<i32>() as i64;
 
     count as i64
 }
