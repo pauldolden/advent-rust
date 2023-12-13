@@ -3,6 +3,7 @@ pub mod _2023 {
     pub mod day10;
     pub mod day11;
     pub mod day12;
+    pub mod day13;
     pub mod day2;
     pub mod day3;
     pub mod day8;
@@ -24,7 +25,9 @@ fn main() {
     // let d111 = crate::_2023::day11::part_one();
     // let d112 = crate::_2023::day11::part_two();
     // let d121 = crate::_2023::day12::part_one();
-    let d122 = crate::_2023::day12::part_two();
+    // let d122 = crate::_2023::day12::part_two();
+    let d131 = crate::_2023::day13::part_one();
+    let d132 = crate::_2023::day13::part_two();
 
     // println!("Day 1 Part 1: {}", d11);
     // println!("Day 1 Part 2: {}", d12);
@@ -39,5 +42,7 @@ fn main() {
     // println!("Day 10 Part 1: {}", d101);
     // println!("Day 10 Part 2: {}", d102);
     // println!("Day 12 Part 1: {}", d121);
-    println!("Day 12 Part 2: {}", d122);
+    // println!("Day 12 Part 2: {}", d122);
+    println!("Day 13 Part 1: {}", d131);
+    println!("Day 13 Part 2: {}", d132);
 }

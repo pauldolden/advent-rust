@@ -45,6 +45,7 @@
 //     for number in numbers {
 //         let (y, (start_x, end_x)) = number;
 //         let mut has_adjacent_symbol = false;
+//
 //     }
 //
 //     print_grid(&grid);
