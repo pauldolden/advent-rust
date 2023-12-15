@@ -1,5 +1,5 @@
 use std::cmp::min;
-use std::fs;
+use std::{fs, i64};
 
 pub fn part_one() -> i64 {
     let grid = fs::read_to_string("src/_2023/13.txt").unwrap();
@@ -47,6 +47,7 @@ fn find_symmetry(grid: &Vec<Vec<Vec<char>>>) -> i64 {
                 if symmetrical {
                     horizontal_symmetry += 100 * (i + 1);
                     found_symmetry = true;
+                    break;
                 }
             }
         }
@@ -93,6 +94,40 @@ fn find_symmetry(grid: &Vec<Vec<Vec<char>>>) -> i64 {
     (horizontal_symmetry + vertical_symmetry) as i64
 }
 
-pub fn part_two() -> i64 {
+fn find_mirror(grid: &[Vec<char>]) -> usize {
+    for r in 1..grid.len() {
+        let above = &grid[..r];
+        let below = &grid[r..];
+
+        let diff = above.iter().rev().zip(below.iter()).fold(0, |acc, (a, b)| {
+            acc + a.iter().zip(b.iter()).filter(|&(x, y)| x != y).count()
+        });
+
+        if diff == 1 {
+            return r;
+        }
+    }
     0
+}
+
+pub fn part_two() -> i64 {
+    let content = fs::read_to_string("./src/_2023/13.txt").expect("Failed to read file");
+
+    let mut total = 0;
+
+    for block in content.split("\n\n") {
+        let grid: Vec<Vec<char>> = block.lines().map(|line| line.chars().collect()).collect();
+
+        let row = find_mirror(&grid);
+        total += row * 100;
+
+        let transposed_grid: Vec<Vec<char>> = (0..grid[0].len())
+            .map(|i| grid.iter().map(|row| row[i]).collect())
+            .collect();
+
+        let col = find_mirror(&transposed_grid);
+        total += col;
+    }
+
+    total as i64
 }
